@@ -28,3 +28,4 @@
 20050114 2.09 algorithm cut out of MANIFEST, sub ascii2str gets no warnings
 20050115 XS tea_code & tea_decode doubles speed; drop Install
 20050116 Crypt-Tea_JS-2.10 Move to New version of the Tea algorithm
+20050215 2.11 fixed test.html asciidigest test, fixed EXPORT_OK doc

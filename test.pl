@@ -54,14 +54,14 @@ ok (&equal(\@ary, [-451692928, 1589210186]), "oldtea_code");
   (-764348263,554905533,637549562,-283747546));
 ok (&equal(\@ary, [-257148566, -1681954940]), "oldtea_decode");
 
-@ary = &Crypt::Tea_JS::newtea_code((2048299521,595110280),
+@ary = &Crypt::Tea_JS::tea_code((2048299521,595110280),
   (-764348263,554905533,637549562,-283747546));
-ok (&equal(\@ary, [-1667003507, 826873245]), "newtea_code");
+ok (&equal(\@ary, [-1667003507, 826873245]), "tea_code");
 
-@ary = &Crypt::Tea_JS::newtea_decode((2048299521,595110280),
+@ary = &Crypt::Tea_JS::tea_decode((2048299521,595110280),
   (-764348263,554905533,637549562,-283747546));
 # print "@ary\n";
-ok (&equal(\@ary, [-1958983444, -475923215]), "newtea_decode");
+ok (&equal(\@ary, [-1958983444, -475923215]), "tea_decode");
 
 ok (&asciidigest($text) eq "7IGNTaSe2ch6WTwcz6c1eA", "asciidigest");
 
@@ -268,7 +268,7 @@ asciidigest('Gloop gleep glorp glurp')
 document.write('   returns ' + asciidigest('Gloop gleep glorp glurp'));
 // -->
 </SCRIPT>
- should be j4u8AWK2n6A4abYVtUAihw
+ should be CygjbXoiuZ5g_O7F0MQG_A
 
 binarydigest('Gloop gleep glorp glurp', 'ksmZjyFSBRc3_cHLUag9zA')
 <SCRIPT LANGUAGE="JavaScript"> <!--
@@ -349,7 +349,7 @@ document.write(decrypt('$c1','$key1'));
 </SCRIPT>
 </FONT></P>
 
-<HR><H3>Now a test of JavaScript encryption . . .</H3><P><FONT SIZE='+1'>
+<HR><H3>Finally a test of JavaScript encryption . . .</H3><P><FONT SIZE='+1'>
 <SCRIPT LANGUAGE="JavaScript"> <!--
 var c2 = encrypt(decrypt('$c2','$key1'),'$key2');
 document.write(decrypt(c2,'$key2'));

@@ -24,7 +24,7 @@
 # Written by Peter J Billam, http://www.pjb.com.au
 
 package Crypt::Tea_JS;
-$VERSION = '2.10';
+$VERSION = '2.11';
 # Don't like depending on externals; this is strong encrytion ... but ...
 require Exporter; require DynaLoader;
 @ISA = qw(Exporter DynaLoader);
@@ -177,7 +177,6 @@ sub encrypt { my ($str,$key)=@_; # encodes with CBC (Cipher Block Chaining)
 		($c0,$c1) = &tea_code ($v0^$c0, $v1^$c1, @key);
 		push @cblocks, $c0, $c1;
 	}
-	my $btmp = &binary2str(@cblocks);
 	return &str2ascii( &binary2str(@cblocks) );
 }
 sub decrypt { my ($acstr, $key) = @_;   # decodes with CBC
@@ -204,32 +203,6 @@ sub triple_encrypt { my ($plaintext,  $long_key) = @_;  # not yet ...
 }
 sub triple_decrypt { my ($cyphertext, $long_key) = @_;  # not yet ...
 }
-sub tea_code   { return &newtea_code(@_); }
-sub tea_decode { return &newtea_decode(@_); }
-# sub tea_code  { my ($v0,$v1, $k0,$k1,$k2,$k3) = @_;
-# 	# TEA. 64-bit cleartext block in $v0,$v1. 128-bit key in $k0..$k3.
-# 	# &prn("tea_code: v0=$v0 v1=$v1");
-# 	use integer;
-# 	my $sum = 0; my $n = 32;
-# 	while ($n-- > 0) {
-# 		$sum += 0x9e3779b9;   # TEA magic number delta
-# 		$v0 += (($v1<<4)+$k0) ^ ($v1+$sum) ^ ((0x07FFFFFF & ($v1>>5))+$k1) ;
-# 		$v1 += (($v0<<4)+$k2) ^ ($v0+$sum) ^ ((0x07FFFFFF & ($v0>>5))+$k3) ;
-# 	}
-# 	return ($v0, $v1);
-# }
-# sub tea_decode  { my ($v0,$v1, $k0,$k1,$k2,$k3) = @_;
-# 	# TEA. 64-bit cyphertext block in $v0,$v1. 128-bit key in $k0..$k3.
-# 	use integer;
-# 	my $sum = 0; my $n = 32;
-# 	$sum = 0x9e3779b9 << 5 ;   # TEA magic number delta
-# 	while ($n-- > 0) {
-# 		$v1 -= (($v0<<4)+$k2) ^ ($v0+$sum) ^ ((0x07FFFFFF & ($v0>>5))+$k3) ;
-# 		$v0 -= (($v1<<4)+$k0) ^ ($v1+$sum) ^ ((0x07FFFFFF & ($v1>>5))+$k1) ;
-# 		$sum -= 0x9e3779b9 ;
-# 	}
-# 	return ($v0, $v1);
-# }
 sub rand_byte {
 	if (! $rand_byte_already_called) {
 		srand(time() ^ ($$+($$<<15))); # could do better, but its only padding
@@ -616,8 +589,7 @@ and some Modes of Use, in Perl and JavaScript.
 The $key is a sufficiently longish string; at least 17 random 8-bit
 bytes for single encryption.
 
-Version 2.10,
-#COMMENT#
+Version 2.11
 
 (c) Peter J Billam 1998
 
@@ -633,6 +605,26 @@ Encrypts with CBC (Cipher Block Chaining)
 
 Decrypts with CBC (Cipher Block Chaining)
 
+=item I<asciidigest>( $a_string );
+
+Returns an asciified binary signature of the argument.
+
+=item I<tea_in_javascript>();
+
+Returns a compatible implementation of TEA in JavaScript,
+for use in CGI scripts to communicate with browsers.
+
+=back
+
+=head1 EXPORT_OK SUBROUTINES
+
+The following routines are not exported by default,
+but are exported under the I<ALL> tag, so if you need them you should:
+
+ import Crypt::Tea_JS qw(:ALL);
+
+=over 3
+
 =item I<binary2ascii>( $a_binary_string );
 
 Provides an ascii text encoding of the binary argument.
@@ -642,15 +634,6 @@ the ascii is split into lines of 72 characters.
 =item I<ascii2binary>( $an_ascii_string );
 
 Provides the binary original of an ascii text encoding.
-
-=item I<asciidigest>( $a_string );
-
-Returns an asciified binary signature of the argument.
-
-=item I<tea_in_javascript>();
-
-Returns a compatible implementation of TEA in JavaScript,
-for use in CGI scripts to communicate with browsers.
 
 =back
 
@@ -755,15 +738,15 @@ See CGI::Htauth.pm for attempts to use this kind of technique.
 =head1 ROADMAP
 
 Crypt::Tea conflicted with a similarly-named Crypt::TEA by Abhijit Menon-Sen.
-Unfortunately, Microsoft operating systems confuses the two names and are
-unable to install both.  Version 2.09 is mature, and apart perhaps from
-minor bug fixes will probably be the final version of Crypt::Tea.
+Unfortunately, Microsoft operating systems confused the two names and are
+unable to install both.  Version 2.09 of Crypt::Tea is mature, and apart
+perhaps from minor bug fixes will probably remain the final version.
 Further development will take place under the name Crypt::Tea_JS.
 The calling interface is identical.
 
 I've taken advantage of the new name to make two important changes
 Crypt::Tea_JS uses the New Improved version of the Tea algorithm,
-which provides even stronger encryption. though it does surrender
+which provides even stronger encryption, though it does surrender
 backward-compatibility for files encrypted by the old Crypt::Tea.
 Secondly, some of the core routines are now implemented in C, for improved
 performance (at the server end, if you're using it in a CGI context).
