@@ -24,15 +24,23 @@
 # Written by Peter J Billam, http://www.pjb.com.au
 
 package Crypt::Tea_JS;
-$VERSION = '2.11';
+$VERSION = '2.12';
 # Don't like depending on externals; this is strong encrytion ... but ...
 require Exporter; require DynaLoader;
 @ISA = qw(Exporter DynaLoader);
 bootstrap Crypt::Tea_JS $VERSION;
 
-@EXPORT=qw(asciidigest encrypt decrypt tea_in_javascript);
+@EXPORT = qw(asciidigest encrypt decrypt tea_in_javascript);
 @EXPORT_OK = qw(str2ascii ascii2str encrypt_and_write);
 %EXPORT_TAGS = (ALL => [@EXPORT,@EXPORT_OK]);
+
+BEGIN {
+	if ($] < 5.006) {
+		$INC{"bytes.pm"} = 1;       # cheating that bytes.pm is loaded
+		*bytes::import   = sub { }; # do nothing
+		*bytes::unimport = sub { };
+	}
+}
 
 # begin config
 my %a2b = (
@@ -68,6 +76,7 @@ sub ascii2binary {
 	return &str2binary(&ascii2str($_[$[]));
 }
 sub str2binary {   my @str = split //, $_[$[];
+	use bytes;
 	my @intarray = (); my $ii = $[;
 	while (1) {
 		last unless @str; $intarray[$ii]  = (0xFF & ord shift @str)<<24;
@@ -589,7 +598,7 @@ and some Modes of Use, in Perl and JavaScript.
 The $key is a sufficiently longish string; at least 17 random 8-bit
 bytes for single encryption.
 
-Version 2.11
+Version 2.12
 
 (c) Peter J Billam 1998
 
@@ -744,8 +753,8 @@ perhaps from minor bug fixes will probably remain the final version.
 Further development will take place under the name Crypt::Tea_JS.
 The calling interface is identical.
 
-I've taken advantage of the new name to make two important changes
-Crypt::Tea_JS uses the New Improved version of the Tea algorithm,
+I've taken advantage of the new name to make two important changes.
+Firstly, Crypt::Tea_JS uses the New Improved version of the Tea algorithm,
 which provides even stronger encryption, though it does surrender
 backward-compatibility for files encrypted by the old Crypt::Tea.
 Secondly, some of the core routines are now implemented in C, for improved

@@ -103,7 +103,7 @@ re-encrypted and re-decrypted by <I>JavaScript</I>.
 This means that <B>everyting&nbsp;works</B>&nbsp;:-)
 EOT
 
-if (! open (F, '>test.html')) { die "Sorry, can't open test.html: $!\n"; }
+if (! open (F, '>test.html')) { die "# sorry, can't write to test.html: $!\n"; }
 $ENV{REMOTE_ADDR} = '123.321.123.321';  # simulate CGI context
 my $c1 = &encrypt ($p1, $key1); 
 my $c2 = &encrypt ($p2, $key1); 

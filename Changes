@@ -29,3 +29,4 @@
 20050115 XS tea_code & tea_decode doubles speed; drop Install
 20050116 Crypt-Tea_JS-2.10 Move to New version of the Tea algorithm
 20050215 2.11 fixed test.html asciidigest test, fixed EXPORT_OK doc
+20050314 2.12 use bytes in str2binary, with workaround for pre-5.6 perl
