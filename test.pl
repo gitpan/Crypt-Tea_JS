@@ -7,7 +7,7 @@
 #            modify it under the same terms as Perl itself.             #
 #########################################################################
 
-use Test::Simple tests => 8;
+use Test::Simple tests => 9;
 use Crypt::Tea_JS;
 
 my $text = <<'EOT';
@@ -69,6 +69,16 @@ my $key1 = &asciidigest ("G $$ ". time);
 my $c = &encrypt ($text, $key1);
 my $p = &decrypt ($c, $key1);
 ok (($p eq $text), "encrypt and decrypt");
+
+if ($] > 5.007) {
+	require Encode;
+	$x = chr(400);
+	$c = &encrypt ($x, $key1);
+	$p = Encode::decode_utf8(&decrypt ($c, $key1));
+	ok (($p eq $x), "encrypt and decrypt utf8");
+} else {
+	ok (1, "skipping utf8 test for perl version < 5.007");
+}
 
 &generate_test_html();
 

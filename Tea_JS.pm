@@ -24,7 +24,7 @@
 # Written by Peter J Billam, http://www.pjb.com.au
 
 package Crypt::Tea_JS;
-$VERSION = '2.12';
+$VERSION = '2.13';
 # Don't like depending on externals; this is strong encrytion ... but ...
 require Exporter; require DynaLoader;
 @ISA = qw(Exporter DynaLoader);
@@ -40,7 +40,9 @@ BEGIN {
 		*bytes::import   = sub { }; # do nothing
 		*bytes::unimport = sub { };
 	}
+	if ($] > 5.007) { require Encode; }
 }
+use bytes;
 
 # begin config
 my %a2b = (
@@ -76,7 +78,6 @@ sub ascii2binary {
 	return &str2binary(&ascii2str($_[$[]));
 }
 sub str2binary {   my @str = split //, $_[$[];
-	use bytes;
 	my @intarray = (); my $ii = $[;
 	while (1) {
 		last unless @str; $intarray[$ii]  = (0xFF & ord shift @str)<<24;
@@ -143,6 +144,10 @@ sub asciidigest {   # returns 22-char ascii signature
 sub binarydigest { my $str = $_[$[];  # returns 4 32-bit-int binary signature
 	# warning: mode of use invented by Peter Billam 1998, needs checking !
 	return '' unless $str;
+	if ($] > 5.007 && Encode::is_utf8($str)) {
+		Encode::_utf8_off($str);
+		# $str = Encode::encode_utf8($str);
+	}
 	# add 1 char ('0'..'15') at front to specify no of pad chars at end ...
 	my $npads = 15 - ((length $str) % 16);
 	$str  = chr($npads) . $str;
@@ -165,8 +170,12 @@ sub binarydigest { my $str = $_[$[];  # returns 4 32-bit-int binary signature
 	return ($c0,$c1,$c2,$c3);
 }
 sub encrypt { my ($str,$key)=@_; # encodes with CBC (Cipher Block Chaining)
-	use integer;
 	return '' unless $str; return '' unless $key;
+	if ($] > 5.007 && Encode::is_utf8($str)) {
+		Encode::_utf8_off($str);
+		# $str = Encode::encode_utf8($str);
+	}
+	use integer;
 	@key = &binarydigest($key);
 
 	# add 1 char ('0'..'7') at front to specify no of pad chars at end ...
@@ -598,7 +607,7 @@ and some Modes of Use, in Perl and JavaScript.
 The $key is a sufficiently longish string; at least 17 random 8-bit
 bytes for single encryption.
 
-Version 2.12
+Version 2.13
 
 (c) Peter J Billam 1998
 
@@ -770,13 +779,14 @@ Based on TEA, as described in
 http://www.cl.cam.ac.uk/ftp/papers/djw-rmn/djw-rmn-tea.html ,
 and on some help from I<Applied Cryptography> by Bruce Schneier
 as regards the modes of use.
-Thanks also to Neil Watkiss for the MakeMaker packaging, and to
-Scott Harrison for suggesting workarounds for MacOS 10.2 browsers,
-and to Morgan Burke for pointing out the problem with URL query strings.
+Thanks also to Neil Watkiss for the MakeMaker packaging,
+to Scott Harrison for suggesting workarounds for MacOS 10.2 browsers,
+to Morgan Burke for pointing out the problem with URL query strings,
+and to Slaven Razic for portability advice in spite of "use bytes".
 
 =head1 SEE ALSO
 
-examples/tea_demo.cgi,
+examples/tea_demo.cgi, perldoc Encode,
 http://www.pjb.com.au/comp, CGI::Htauth.pm, tea(1), perl(1).
 
 =cut
