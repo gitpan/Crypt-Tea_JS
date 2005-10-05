@@ -9,6 +9,7 @@
 
 use Test::Simple tests => 9;
 use Crypt::Tea_JS;
+use integer;
 
 my $text = <<'EOT';
 Hier lieg' ich auf dem Frülingshügel:
@@ -47,21 +48,20 @@ ok (&equal(\@ary,
  [423887967, 1601117047, 751062895, 3646648452]), "ascii2binary");
 
 @ary = &Crypt::Tea_JS::oldtea_code((2048299521,595110280),
-  (-764348263,554905533,637549562,-283747546));
-ok (&equal(\@ary, [-451692928, 1589210186]), "oldtea_code");
+  (032234174231,554905533,637549562,035705455446));
+ok (&equal(\@ary, [034504733200, 1589210186]), "oldtea_code");
 
 @ary = &Crypt::Tea_JS::oldtea_decode((2048299521,595110280),
-  (-764348263,554905533,637549562,-283747546));
-ok (&equal(\@ary, [-257148566, -1681954940]), "oldtea_decode");
+  (032234174231,554905533,637549562,035705455446));
+ok (&equal(\@ary, [036053034552, 023357663604]), "oldtea_decode");
 
 @ary = &Crypt::Tea_JS::tea_code((2048299521,595110280),
-  (-764348263,554905533,637549562,-283747546));
-ok (&equal(\@ary, [-1667003507, 826873245]), "tea_code");
+  (032234174231,554905533,637549562,035705455446));
+ok (&equal(\@ary, [023450705615, 826873245]), "tea_code");
 
 @ary = &Crypt::Tea_JS::tea_decode((2048299521,595110280),
-  (-764348263,554905533,637549562,-283747546));
-# print "@ary\n";
-ok (&equal(\@ary, [-1958983444, -475923215]), "tea_decode");
+  (032234174231,554905533,637549562,035705455446));
+ok (&equal(\@ary, [021317044354, 034350376361]), "tea_decode");
 
 ok (&asciidigest($text) eq "7IGNTaSe2ch6WTwcz6c1eA", "asciidigest");
 
@@ -70,14 +70,17 @@ my $c = &encrypt ($text, $key1);
 my $p = &decrypt ($c, $key1);
 ok (($p eq $text), "encrypt and decrypt");
 
-if ($] > 5.007) {
-	require Encode;
-	$x = chr(400);
-	$c = &encrypt ($x, $key1);
-	$p = Encode::decode_utf8(&decrypt ($c, $key1));
-	ok (($p eq $x), "encrypt and decrypt utf8");
-} else {
-	ok (1, "skipping utf8 test for perl version < 5.007");
+{
+	no integer;
+	if ($] > 5.007) {
+		require Encode;
+		$x = chr(400);
+		$c = &encrypt ($x, $key1);
+		$p = Encode::decode_utf8(&decrypt ($c, $key1));
+		ok (($p eq $x), "encrypt and decrypt utf8");
+	} else {
+		ok (1, "skipping utf8 test for perl version < 5.007");
+	}
 }
 
 &generate_test_html();

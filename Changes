@@ -31,3 +31,4 @@
 20050215 2.11 fixed test.html asciidigest test, fixed EXPORT_OK doc
 20050314 2.12 use bytes in str2binary, with workaround for pre-5.6 perl
 20050323 2.13 utf8 detection and encoding in encrypt, binarydigest and test.pl
+20051005 2.14 -ve ints cut out of test.pl, to cope with 64bit machines
