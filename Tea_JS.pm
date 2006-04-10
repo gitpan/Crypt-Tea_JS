@@ -24,7 +24,7 @@
 # Written by Peter J Billam, http://www.pjb.com.au
 
 package Crypt::Tea_JS;
-$VERSION = '2.14';
+$VERSION = '2.15';
 # Don't like depending on externals; this is strong encrytion ... but ...
 require Exporter; require DynaLoader;
 @ISA = qw(Exporter DynaLoader);
@@ -607,7 +607,7 @@ and some Modes of Use, in Perl and JavaScript.
 The $key is a sufficiently longish string; at least 17 random 8-bit
 bytes for single encryption.
 
-Version 2.14
+Version 2.15
 
 (c) Peter J Billam 1998
 
