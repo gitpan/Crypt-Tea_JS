@@ -24,7 +24,7 @@
 # Written by Peter J Billam, http://www.pjb.com.au
 
 package Crypt::Tea_JS;
-$VERSION = '2.15';
+$VERSION = '2.16';
 # Don't like depending on externals; this is strong encrytion ... but ...
 require Exporter; require DynaLoader;
 @ISA = qw(Exporter DynaLoader);
@@ -118,7 +118,7 @@ sub ascii2str {   my $a = $_[$[]; # converts pseudo-base64 to string of bytes
 		$ia++; last if ($ia>=$la);
 		$b[$ib] |= $a2b{substr $a, $ia+$[, 1}; $ib++;
 	}
-	return pack 'c*', @b;
+	return pack 'C*', @b;   # 2.16
 }
 sub str2ascii {   my $b = $_[$[]; # converts string of bytes to pseudo-base64
 	my $ib = $[;  my $lb = length $b;  my @s = ();
@@ -607,7 +607,7 @@ and some Modes of Use, in Perl and JavaScript.
 The $key is a sufficiently longish string; at least 17 random 8-bit
 bytes for single encryption.
 
-Version 2.15
+Version 2.16
 
 (c) Peter J Billam 1998
 

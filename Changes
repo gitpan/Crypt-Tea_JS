@@ -33,3 +33,4 @@
 20050323 2.13 utf8 detection and encoding in encrypt, binarydigest and test.pl
 20051005 2.14 -ve ints cut out of test.pl, to cope with 64bit machines
 20060410 2.15 Tea_JS.xs syntax refined to avoid warnings with gcc 4.1.0
+20060823 2.16 pack 'c*' changed to pack 'C*'
