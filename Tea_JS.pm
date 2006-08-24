@@ -24,7 +24,7 @@
 # Written by Peter J Billam, http://www.pjb.com.au
 
 package Crypt::Tea_JS;
-$VERSION = '2.16';
+$VERSION = '2.17';
 # Don't like depending on externals; this is strong encrytion ... but ...
 require Exporter; require DynaLoader;
 @ISA = qw(Exporter DynaLoader);
@@ -607,7 +607,7 @@ and some Modes of Use, in Perl and JavaScript.
 The $key is a sufficiently longish string; at least 17 random 8-bit
 bytes for single encryption.
 
-Version 2.16
+Version 2.17
 
 (c) Peter J Billam 1998
 
@@ -757,7 +757,7 @@ See CGI::Htauth.pm for attempts to use this kind of technique.
 
 Crypt::Tea conflicted with a similarly-named Crypt::TEA by Abhijit Menon-Sen.
 Unfortunately, Microsoft operating systems confused the two names and are
-unable to install both.  Version 2.09 of Crypt::Tea is mature, and apart
+unable to install both.  Version 2.10 of Crypt::Tea is mature, and apart
 perhaps from minor bug fixes will probably remain the final version.
 Further development will take place under the name Crypt::Tea_JS.
 The calling interface is identical.
