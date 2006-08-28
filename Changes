@@ -35,3 +35,4 @@
 20060410 2.15 Tea_JS.xs syntax refined to avoid warnings with gcc 4.1.0
 20060823 2.16 pack 'c*' changed to pack 'C*'
 20060824 2.17 cut out ppport.h to avoid a compile warning
+20060828 2.18 64-bit bug fixed in Tea_JS.xs
