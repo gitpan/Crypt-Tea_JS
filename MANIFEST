@@ -5,6 +5,7 @@ Makefile.PL
 test.pl
 Tea_JS.pm
 Tea_JS.xs
+META.yml
 bin/tea
 examples/old_tea_demo.cgi
 examples/tea_demo.cgi

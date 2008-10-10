@@ -24,7 +24,7 @@
 # Written by Peter J Billam, http://www.pjb.com.au
 
 package Crypt::Tea_JS;
-$VERSION = '2.20';
+$VERSION = '2.21';
 # Don't like depending on externals; this is strong encrytion ... but ...
 require Exporter; require DynaLoader;
 @ISA = qw(Exporter DynaLoader);
@@ -622,7 +622,7 @@ If a travelling employee can carry a session-startup file
 then they are invulnerable to imposter-web-hosts
 trying to feed them trojan JavaScript.
 
-Version 2.20
+Version 2.21
 
 (c) Peter J Billam 1998
 
@@ -695,70 +695,32 @@ back and forth in cleartext as an ordinary form variable.
 On the server, typically you will retrieve the Key from a
 database of some sort, for example:
 
- $plaintext = "<P>Hello World !</P>\n";
  dbmopen %keys, "/home/wherever/passwords", 0666;
- $key = $keys{$username};
- dbmclose %keys;
- $cyphertext = encrypt($plaintext, $key);
+ $key = $keys{$username};  dbmclose %keys;
+ $cyphertext = encrypt("<P>Hello World !</P>\n", $key);
 
-At the browser end,
-just ask the user for their password when they load an encrypted page.
+At the browser end, just ask the user for their password when
+they load an encrypted page, e.g.
 
  print tea_in_javascript(), <<EOT;
- <SCRIPT LANGUAGE="JavaScript"> <!--
+ <SCRIPT LANGUAGE="JavaScript">
  var key = prompt("Password ?","");
- document.write(decrypt("$cyphertext", key));
- // -->
+ document.write(decrypt($cyphertext, key));
  </SCRIPT>
  EOT
 
 To submit an encrypted FORM, the traditional way is to construct two FORMs;
 an overt one which the user fills in but which never actually gets
 submitted, and a covert one which will hold the cyphertext.
+See the cgi script C<examples/old_tea_demo.cgi> in the distribution directory.
 
- print <<'EOT';
- <SCRIPT LANGUAGE="JavaScript"> <!--
- function submitter (form) { // NB: a javascript: url passes the frame
-   var plaintext = "";
-   for (var i=0; i<form.length; i++) { // construct ff-separated list
-     var e = form.elements[i];
-     plaintext += (e.name+"\f"+ e.value+"\f"); 
-   }
-   document.covert.cyphertext.value = encrypt (plaintext, key);
-   document.covert.submit();   // submit the covert form
-   return false;  // don't actually submit the overt form
- }
- // -->
- </SCRIPT>
- EOT
-
- print <<EOT;
- <FORM NAME="covert" ACTION="$ENV{SCRIPT_NAME}" METHOD="post">
- <INPUT TYPE="hidden" NAME="username" VALUE="$username">
- <INPUT TYPE="hidden" NAME="cyphertext" VALUE="">
- </FORM>
-
- <FORM NAME="overt" onSubmit="return submitter(this)">
- <TABLE>
- <TR><TH>Contact</TH><TD><INPUT TYPE="text" NAME="contact"></TD></TR>
- <TR><TH>Date   </TH><TD><INPUT TYPE="text" NAME="date">   </TD></TR>
- <TR><TH>Report </TH><TD><INPUT TYPE="text" NAME="report"> </TD></TR>
- </TABLE>
- <INPUT TYPE="submit">
- </FORM>
- EOT
-
-See the cgi script examples/tea_demo.cgi in the distribution directory.
-
-More often you want the browser to remember its Key from page to page,
-to form a session.
-If you store the Key in a Cookie, it is vulnerable to
-any imposter server who imitates your IP address,
-and also to anyone who sits down at the user's computer.
-Better is to store the Key in a JavaScript variable,
-and communicate with the server in I<Ajax> style,
-with I<XMLHttpRequest> or I<ActiveXObject>,
-and I<responseText> or I<responseXML>.
+More often you want the browser to remember its Key from page to page, to
+form a session.  If you store the Key in a Cookie, it is vulnerable to any
+imposter server who imitates your IP address, and also to anyone who sits
+down at the user's computer.  Better is to store the Key in a JavaScript
+variable, and communicate with the server in I<Ajax> style, with
+I<XMLHttpRequest> or I<ActiveXObject>, and I<responseText> or I<responseXML>.
+See the cgi script C<examples/tea_demo.cgi> in the distribution directory.
 
 =head1 ROADMAP
 

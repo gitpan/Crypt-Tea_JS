@@ -3,8 +3,8 @@
 
 This module implements TEA, the Tiny Encryption Algorithm, and some
 Modes of Use based on CBC, compatibly in both Perl and JavaScript.
-This enables CGI scripts to communicate with browsers, as well as working
-as a normal private-key strong-encryption engine.
+This enables CGI scripts to communicate with browsers, as well as
+working as a normal private-key strong-encryption engine.
 
 Subroutines offer encryption, decryption & digest, and all cyphertext
 is ascii-encoded to prevent munging. Another routine returns JavaScript

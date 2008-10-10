@@ -37,3 +37,5 @@
 20060824 2.17 cut out ppport.h to avoid a compile warning
 20060828 2.18 64-bit bug fixed in Tea_JS.xs
 20060829 2.19 for speed, 64-bit bug-fix only included on 64-bit machines
+20081010 2.20 examples/tea_demo.cgi updated into the Ajax era
+20081011 2.21 correspondingly updated the JAVASCRIPT section in the doc
