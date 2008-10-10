@@ -124,15 +124,14 @@ print F "<HTML><HEAD><TITLE>test.html</TITLE>\n",&tea_in_javascript(),<<'EOT';
 </HEAD><BODY BGCOLOR="#FFFFFF">
 <P><H2>
 This page is a test of the JavaScript side of
-<A HREF="http://www.pjb.com.au/comp/tea.html">Crypt::Tea_JS.pm</A>
+<A HREF="http://search.cpan.org/~pjb">Crypt::Tea_JS.pm</A>
 </H2></P>
 
 <HR>
 <H3>First a quick check of the various JavaScript functions . . .</H3>
 <P>If any of these functions do not return what they should,
 please use your mouse to cut-and-paste all the bit in
-<CODE>constant-width</CODE> font,
-and paste it into an email to
+<CODE>constant-width</CODE> font, and paste it into an email to
 <A HREF="http://www.pjb.com.au/comp/contact.html">Peter&nbsp;Billam</A>
 </P>
 <PRE>

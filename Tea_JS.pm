@@ -13,18 +13,18 @@
 # Usage:
 #    use Tea_JS;
 #    $key = 'PUFgob$*LKDF D)(F IDD&P?/';
-#    $ascii_cyphertext = &encrypt ($plaintext, $key);
+#    $ascii_cyphertext = encrypt($plaintext, $key);
 #    ...
-#    $plaintext_again = &decrypt ($ascii_cyphertext, $key);
+#    $plaintext_again = decrypt($ascii_cyphertext, $key);
 #    ...
-#    $signature = &asciidigest ($text);
+#    $signature = asciidigest($text);
 #
 # The $key is a sufficiently longish string; at least 17 random 8-bit bytes
 #
 # Written by Peter J Billam, http://www.pjb.com.au
 
 package Crypt::Tea_JS;
-$VERSION = '2.19';
+$VERSION = '2.20';
 # Don't like depending on externals; this is strong encrytion ... but ...
 require Exporter; require DynaLoader;
 @ISA = qw(Exporter DynaLoader);
@@ -68,14 +68,14 @@ sub encrypt_and_write { my ($str, $key) = @_;
 	return unless $str; return unless $key;
 	print
 	"<SCRIPT LANGUAGE=\"JavaScript\">\n<!--\nparent.decrypt_and_write('";
-	print &encrypt($str,$key);
+	print encrypt($str,$key);
 	print "');\n// -->\n</SCRIPT>\n";
 }
 sub binary2ascii {
-	return &str2ascii(&binary2str(@_));
+	return str2ascii(binary2str(@_));
 }
 sub ascii2binary {
-	return &str2binary(&ascii2str($_[$[]));
+	return str2binary(ascii2str($_[$[]));
 }
 sub str2binary {   my @str = split //, $_[$[];
 	my @intarray = (); my $ii = $[;
@@ -91,8 +91,8 @@ sub str2binary {   my @str = split //, $_[$[];
 sub binary2str {
 	my @str = ();
 	foreach $i (@_) {
-		push @str, chr (0xFF & ($i>>24)), chr (0xFF & ($i>>16)),
-		 chr (0xFF & ($i>>8)), chr (0xFF & $i);
+		push @str, chr(0xFF & ($i>>24)), chr(0xFF & ($i>>16)),
+		 chr(0xFF & ($i>>8)), chr(0xFF & $i);
 	}
 	return join '', @str;
 }
@@ -136,10 +136,10 @@ sub str2ascii {   my $b = $_[$[]; # converts string of bytes to pseudo-base64
 		push @s, $b2a{($b3>>6) | ($carry<<2)}, $b2a{077 & $b3};
 		if (!$ENV{REMOTE_ADDR} && (($ib % 36) == 0)) { push @s, "\n"; }
 	}
-	return join ('', @s);
+	return join('', @s);
 }
 sub asciidigest {   # returns 22-char ascii signature
-	return &binary2ascii(&binarydigest($_[$[]));
+	return binary2ascii(binarydigest($_[$[]));
 }
 sub binarydigest { my $str = $_[$[];  # returns 4 32-bit-int binary signature
 	# warning: mode of use invented by Peter Billam 1998, needs checking !
@@ -152,7 +152,7 @@ sub binarydigest { my $str = $_[$[];  # returns 4 32-bit-int binary signature
 	my $npads = 15 - ((length $str) % 16);
 	$str  = chr($npads) . $str;
 	if ($npads) { $str .= "\0" x $npads; }
-	my @str = &str2binary($str);
+	my @str = str2binary($str);
 	my @key = (0x61626364, 0x62636465, 0x63646566, 0x64656667);
 
 	my ($cswap, $v0, $v1, $v2, $v3);
@@ -162,8 +162,8 @@ sub binarydigest { my $str = $_[$[];  # returns 4 32-bit-int binary signature
 		# shift 2 blocks off front of str ...
 		$v0 = shift @str; $v1 = shift @str; $v2 = shift @str; $v3 = shift @str;
 		# cipher them XOR'd with previous stage ...
-		($c0,$c1) = &tea_code ($v0^$c0, $v1^$c1, @key);
-		($c2,$c3) = &tea_code ($v2^$c2, $v3^$c3, @key);
+		($c0,$c1) = tea_code($v0^$c0, $v1^$c1, @key);
+		($c2,$c3) = tea_code($v2^$c2, $v3^$c3, @key);
 		# mix up the two cipher blocks with a 4-byte left rotation ...
 		$cswap  = $c0; $c0=$c1; $c1=$c2; $c2=$c3; $c3=$cswap;
 	}
@@ -176,42 +176,42 @@ sub encrypt { my ($str,$key)=@_; # encodes with CBC (Cipher Block Chaining)
 		# $str = Encode::encode_utf8($str);
 	}
 	use integer;
-	@key = &binarydigest($key);
+	@key = binarydigest($key);
 
 	# add 1 char ('0'..'7') at front to specify no of pad chars at end ...
 	my $npads = 7 - ((length $str) % 8);
-	$str  = chr($npads|(0xF8 & &rand_byte)) . $str;
+	$str  = chr($npads|(0xF8 & rand_byte())) . $str;
 	if ($npads) {
-		my $padding = pack 'CCCCCCC', &rand_byte, &rand_byte,
-		 &rand_byte, &rand_byte, &rand_byte, &rand_byte, &rand_byte; 
+		my $padding = pack 'CCCCCCC', rand_byte(), rand_byte(),
+		 rand_byte(), rand_byte(), rand_byte(), rand_byte(), rand_byte(); 
 		$str  = $str . substr($padding,$[,$npads);
 	}
-	my @pblocks = &str2binary($str);
+	my @pblocks = str2binary($str);
 	my $v0; my $v1;
 	my $c0 = 0x61626364; my $c1 = 0x62636465; # CBC Initial Value. Retain !
 	my @cblocks;
 	while (1) {
 		last unless @pblocks; $v0 = shift @pblocks; $v1 = shift @pblocks;
-		($c0,$c1) = &tea_code ($v0^$c0, $v1^$c1, @key);
+		($c0,$c1) = tea_code($v0^$c0, $v1^$c1, @key);
 		push @cblocks, $c0, $c1;
 	}
-	return &str2ascii( &binary2str(@cblocks) );
+	return str2ascii( binary2str(@cblocks) );
 }
 sub decrypt { my ($acstr, $key) = @_;   # decodes with CBC
 	use integer;
 	return '' unless $acstr; return '' unless $key;
-	@key = &binarydigest($key);
+	@key = binarydigest($key);
 	my $v0; my $v1; my $c0; my $c1; my @pblocks = (); my $de0; my $de1;
 	my $lastc0 = 0x61626364; my $lastc1 = 0x62636465; # CBC Init Val. Retain!
-	my @cblocks = &str2binary( &ascii2str($acstr) );
+	my @cblocks = str2binary( ascii2str($acstr) );
 	while (1) {
 		last unless @cblocks; $c0 = shift @cblocks; $c1 = shift @cblocks;
-		($de0, $de1) = &tea_decode ($c0,$c1, @key);
+		($de0, $de1) = tea_decode($c0,$c1, @key);
 		$v0 = $lastc0 ^ $de0;   $v1 = $lastc1 ^ $de1;
 		push @pblocks, $v0, $v1;
 		$lastc0 = $c0;   $lastc1 = $c1;
 	}
-	my $str = &binary2str( @pblocks );
+	my $str = binary2str(@pblocks);
 	# remove no of pad chars at end specified by 1 char ('0'..'7') at front
 	my $npads = 0x7 & ord $str; substr ($str, $[, 1) = '';
 	if ($npads) { substr ($str, 0 - $npads) = ''; }
@@ -584,16 +584,16 @@ Usage:
 
  use Crypt::Tea_JS;
  $key = 'PUFgob$*LKDF D)(F IDD&P?/';
- $ascii_cyphertext = &encrypt ($plaintext, $key);
+ $ascii_cyphertext = encrypt($plaintext, $key);
  ...
- $plaintext_again = &decrypt ($ascii_cyphertext, $key);
+ $plaintext_again = decrypt($ascii_cyphertext, $key);
  ...
- $signature = &asciidigest ($text);
+ $signature = asciidigest($text);
 
 In CGI scripts:
 
  use Crypt::Tea_JS;
- print &tea_in_javascript;
+ print tea_in_javascript();
  # now the browser can encrypt and decrypt ! In JS:
  var ascii_ciphertext = encrypt (plaintext, key);
  var plaintext_again  = decrypt (ascii_ciphertext, key);
@@ -607,7 +607,22 @@ and some Modes of Use, in Perl and JavaScript.
 The $key is a sufficiently longish string; at least 17 random 8-bit
 bytes for single encryption.
 
-Version 2.19
+Crypt::Tea_JS can be used for secret-key encryption in general,
+or, in particular, to communicate securely between browser and web-host.
+In this case, the simplest arrangement is for the user to
+enter the key into a JavaScript variable, and for the host to
+retrieve that user's key from a database.
+Or, for extra security, the first message (or even each message)
+between browser and host could contain a random challenge-string,
+which each end would then turn into a signature,
+and use that signature as the encryption-key for the session (or the reply).
+
+If a travelling employee can carry a session-startup file
+(e.g. I<login_on_the_road.html>) on their laptop,
+then they are invulnerable to imposter-web-hosts
+trying to feed them trojan JavaScript.
+
+Version 2.20
 
 (c) Peter J Billam 1998
 
@@ -681,16 +696,15 @@ On the server, typically you will retrieve the Key from a
 database of some sort, for example:
 
  $plaintext = "<P>Hello World !</P>\n";
- dbmopen %keys, "/home/wherever/passwords";
+ dbmopen %keys, "/home/wherever/passwords", 0666;
  $key = $keys{$username};
  dbmclose %keys;
- $cyphertext = &encrypt ($plaintext, $key);
+ $cyphertext = encrypt($plaintext, $key);
 
-At the browser end there are various ways of doing it.
-Easiest is to ask the user for their password every time
-they view an encrypted page, or submit a form.
+At the browser end,
+just ask the user for their password when they load an encrypted page.
 
- print &tea_in_javascript(), <<EOT;
+ print tea_in_javascript(), <<EOT;
  <SCRIPT LANGUAGE="JavaScript"> <!--
  var key = prompt("Password ?","");
  document.write(decrypt("$cyphertext", key));
@@ -698,9 +712,9 @@ they view an encrypted page, or submit a form.
  </SCRIPT>
  EOT
 
-To submit an encrypted FORM, the neatest way is to contruct two FORMs;
-one overt one which the user fills in but which never actually gets
-submitted, and one covert one which will hold the cyphertext.
+To submit an encrypted FORM, the traditional way is to construct two FORMs;
+an overt one which the user fills in but which never actually gets
+submitted, and a covert one which will hold the cyphertext.
 
  print <<'EOT';
  <SCRIPT LANGUAGE="JavaScript"> <!--
@@ -736,22 +750,15 @@ submitted, and one covert one which will hold the cyphertext.
 
 See the cgi script examples/tea_demo.cgi in the distribution directory.
 
-If you want the browser to remember its Key from page to page,
-to form a session, then things get harder.
+More often you want the browser to remember its Key from page to page,
+to form a session.
 If you store the Key in a Cookie, it is vulnerable to
 any imposter server who imitates your IP address,
 and also to anyone who sits down at the user's computer.
-However, this remains the most practical option.
-
-The alternative is to store the Key in a JavaScript variable,
-but unfortunately all JavaScript variables get anihilated when
-you load a new page into the same target frame.
-Therefore you have to store the Key in a JavaScript variable
-in a frameset, open up a subframe covering almost all the screen,
-and load the subsequent pages into that subframe;
-they can then use I<parent.key> to encrypt and decrypt.
-This can become intractable.
-See CGI::Htauth.pm for attempts to use this kind of technique.
+Better is to store the Key in a JavaScript variable,
+and communicate with the server in I<Ajax> style,
+with I<XMLHttpRequest> or I<ActiveXObject>,
+and I<responseText> or I<responseXML>.
 
 =head1 ROADMAP
 

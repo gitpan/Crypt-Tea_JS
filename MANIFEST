@@ -6,4 +6,5 @@ test.pl
 Tea_JS.pm
 Tea_JS.xs
 bin/tea
+examples/old_tea_demo.cgi
 examples/tea_demo.cgi

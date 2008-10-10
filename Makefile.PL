@@ -15,3 +15,9 @@ WriteMakefile(
 	DEFINE    => $define, # e.g., '-DHAVE_SOMETHING'
 	INC       => '-I.', # e.g., '-I. -I/usr/include/other'
 );
+
+require './Tea_JS.pm';
+if (open(F, '>Tea_JS.js')) { 
+	print F Crypt::Tea_JS::tea_in_javascript();
+	close F;
+}
