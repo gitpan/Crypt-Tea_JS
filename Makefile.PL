@@ -16,8 +16,9 @@ WriteMakefile(
 	INC       => '-I.', # e.g., '-I. -I/usr/include/other'
 );
 
-require './Tea_JS.pm';
-if (open(F, '>Tea_JS.js')) { 
-	print F Crypt::Tea_JS::tea_in_javascript();
-	close F;
-}
+#do './Tea_JS.pm';   # this fails when installing with cpan :-(
+# now incuded in tarball
+#if (open(F, '>Tea_JS.js')) { 
+#	print F Crypt::Tea_JS::tea_in_javascript();
+#	close F;
+#}
