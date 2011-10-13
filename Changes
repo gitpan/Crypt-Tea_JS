@@ -39,3 +39,5 @@
 20060829 2.19 for speed, 64-bit bug-fix only included on 64-bit machines
 20081010 2.20 examples/tea_demo.cgi updated into the Ajax era
 20081011 2.21 correspondingly updated the JAVASCRIPT section in the doc
+20100516 2.22 include js in tarball; now installs with cpan
+20111011 2.23 uses XSLoader, and reverts to PurePerl if the C library missing

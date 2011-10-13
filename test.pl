@@ -7,7 +7,7 @@
 #            modify it under the same terms as Perl itself.             #
 #########################################################################
 
-use Test::Simple tests => 9;
+use Test::Simple tests => 13;
 use Crypt::Tea_JS;
 use integer;
 
@@ -55,6 +55,14 @@ ok (&equal(\@ary, [034504733200, 1589210186]), "oldtea_code");
   (032234174231,554905533,637549562,035705455446));
 ok (&equal(\@ary, [036053034552, 023357663604]), "oldtea_decode");
 
+@ary = &Crypt::Tea_JS::pp_oldtea_code((2048299521,595110280),
+  (032234174231,554905533,637549562,035705455446));
+ok (&equal(\@ary, [034504733200, 1589210186]), "pp_oldtea_code");
+
+@ary = &Crypt::Tea_JS::pp_oldtea_decode((2048299521,595110280),
+  (032234174231,554905533,637549562,035705455446));
+ok (&equal(\@ary, [036053034552, 023357663604]), "pp_oldtea_decode");
+
 @ary = &Crypt::Tea_JS::tea_code((2048299521,595110280),
   (032234174231,554905533,637549562,035705455446));
 ok (&equal(\@ary, [023450705615, 826873245]), "tea_code");
@@ -62,6 +70,14 @@ ok (&equal(\@ary, [023450705615, 826873245]), "tea_code");
 @ary = &Crypt::Tea_JS::tea_decode((2048299521,595110280),
   (032234174231,554905533,637549562,035705455446));
 ok (&equal(\@ary, [021317044354, 034350376361]), "tea_decode");
+
+@ary = &Crypt::Tea_JS::pp_tea_code((2048299521,595110280),
+  (032234174231,554905533,637549562,035705455446));
+ok (&equal(\@ary, [023450705615, 826873245]), "pp_tea_code");
+
+@ary = &Crypt::Tea_JS::pp_tea_decode((2048299521,595110280),
+  (032234174231,554905533,637549562,035705455446));
+ok (&equal(\@ary, [021317044354, 034350376361]), "pp_tea_decode");
 
 ok (&asciidigest($text) eq "7IGNTaSe2ch6WTwcz6c1eA", "asciidigest");
 

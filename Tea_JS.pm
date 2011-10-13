@@ -24,11 +24,18 @@
 # Written by Peter J Billam, http://www.pjb.com.au
 
 package Crypt::Tea_JS;
-$VERSION = '2.22';
+$VERSION = '2.23';
 # Don't like depending on externals; this is strong encrytion ... but ...
-require Exporter; require DynaLoader;
-@ISA = qw(Exporter DynaLoader);
-bootstrap Crypt::Tea_JS $VERSION;
+require Exporter;
+@ISA = qw(Exporter);
+
+eval { require XSLoader; XSLoader::load('Crypt::Tea_JS', $VERSION); };
+if ($@) {   # 2.23 revert to PurePerl
+	*tea_code      = \&pp_tea_code;
+	*tea_decode    = \&pp_tea_decode;
+	*oldtea_code   = \&pp_oldtea_code;
+	*oldtea_decode = \&pp_oldtea_decode;
+}
 
 @EXPORT = qw(asciidigest encrypt decrypt tea_in_javascript);
 @EXPORT_OK = qw(str2ascii ascii2str encrypt_and_write);
@@ -41,6 +48,9 @@ BEGIN {
 		*bytes::unimport = sub { };
 	}
 	if ($] > 5.007) { require Encode; }
+}
+if (! defined &tea_code) {
+	die "C library missing, and couldn't eval pp_tea_code\n";
 }
 use bytes;
 
@@ -221,6 +231,63 @@ sub triple_encrypt { my ($plaintext,  $long_key) = @_;  # not yet ...
 }
 sub triple_decrypt { my ($cyphertext, $long_key) = @_;  # not yet ...
 }
+
+# PurePerl versions: introduced in 2.23
+sub pp_tea_code  { my ($v0,$v1,@k) = @_;
+	# Note that both "<<" and ">>" in Perl are implemented directly using
+	# "<<" and ">>" in C.  If "use integer" (see "Integer Arithmetic") is in
+	# force then signed C integers are used, else unsigned C integers are used.
+	use integer;
+	my $sum = 0; my $n = 32;
+	while ($n-- > 0) {
+		$v0 += ((($v1<<4)^(0x07FFFFFF&($v1>>5)))+$v1) ^ ($sum+$k[$sum&3]);
+		$v0 &= 0xFFFFFFFF;
+		$sum += 0x9e3779b9;   # TEA magic number delta
+		# $sum &= 0xFFFFFFFF; # changes nothing
+		$v1 += ((($v0<<4)^(0x07FFFFFF&($v0>>5)))+$v0)^($sum+$k[($sum>>11)&3]);
+		$v1 &= 0xFFFFFFFF;
+	}
+	return ($v0, $v1);
+}
+sub pp_tea_decode  { my ($v0,$v1, @k) = @_;
+	use integer;
+	my $sum = 0; my $n = 32;
+	$sum = 0x9e3779b9 << 5 ;   # TEA magic number delta
+	while ($n-- > 0) {
+		$v1 -= ((($v0<<4)^(0x07FFFFFF&($v0>>5)))+$v0)^($sum+$k[($sum>>11)&3]);
+		$v1 &= 0xFFFFFFFF;
+		$sum -= 0x9e3779b9 ;
+		$v0 -= ((($v1<<4)^(0x07FFFFFF&($v1>>5)))+$v1) ^ ($sum+$k[$sum&3]);
+		$v0 &= 0xFFFFFFFF;
+	}
+	return ($v0, $v1);
+}
+sub pp_oldtea_code  { my ($v0,$v1, $k0,$k1,$k2,$k3) = @_;
+	use integer;
+	my $sum = 0; my $n = 32;
+	while ($n-- > 0) {
+		$sum += 0x9e3779b9;   # TEA magic number delta
+		$v0 += (($v1<<4)+$k0) ^ ($v1+$sum) ^ ((0x07FFFFFF & ($v1>>5))+$k1) ;
+		$v0 &= 0xFFFFFFFF;
+		$v1 += (($v0<<4)+$k2) ^ ($v0+$sum) ^ ((0x07FFFFFF & ($v0>>5))+$k3) ;
+		$v1 &= 0xFFFFFFFF;
+	}
+	return ($v0, $v1);
+}
+sub pp_oldtea_decode  { my ($v0,$v1, $k0,$k1,$k2,$k3) = @_;
+	use integer;
+	my $sum = 0; my $n = 32;
+	$sum = 0x9e3779b9 << 5 ;   # TEA magic number delta
+	while ($n-- > 0) {
+		$v1 -= (($v0<<4)+$k2) ^ ($v0+$sum) ^ ((0x07FFFFFF & ($v0>>5))+$k3) ;
+		$v1 &= 0xFFFFFFFF;
+		$v0 -= (($v1<<4)+$k0) ^ ($v1+$sum) ^ ((0x07FFFFFF & ($v1>>5))+$k1) ;
+		$v0 &= 0xFFFFFFFF;
+		$sum -= 0x9e3779b9 ;
+	}
+	return ($v0, $v1);
+}
+
 sub rand_byte {
 	if (! $rand_byte_already_called) {
 		srand(time() ^ ($$+($$<<15))); # could do better, but its only padding
@@ -622,7 +689,7 @@ If a travelling employee can carry a session-startup file
 then they are invulnerable to imposter-web-hosts
 trying to feed them trojan JavaScript.
 
-Version 2.22
+Version 2.23
 
 (c) Peter J Billam 1998
 
